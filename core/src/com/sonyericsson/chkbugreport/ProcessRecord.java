@@ -25,6 +25,7 @@ public class ProcessRecord extends Chapter {
 
     private int mPid;
     private int mNamePrio;
+    private String mProcUser = "-";
     private String mProcName;
     private boolean mExport = false;
 
@@ -56,6 +57,10 @@ public class ProcessRecord extends Chapter {
 
     public String getProcName() {
         return mProcName;
+    }
+
+    public String getProcUser() {
+        return mProcUser;
     }
 
     public void setExport() {

@@ -42,16 +42,18 @@ public class PSRecord implements Iterable<PSRecord> {
     int mPPid;
     int mPcy;
     int mNice;
+    String mUser;
     String mName;
     PSRecord mParent;
     Vector<PSRecord> mChildren = new Vector<PSRecord>();
 
-    public PSRecord(int pid, int ppid, int nice, int pcy, String name) {
+    public PSRecord(int pid, int ppid, int nice, int pcy, String name, String user) {
         mPid = pid;
         mPPid = ppid;
         mNice = nice;
         mPcy = pcy;
         mName = name;
+        mUser = user;
     }
 
     public int getPid() {
@@ -84,6 +86,10 @@ public class PSRecord implements Iterable<PSRecord> {
     }
     public String getName() {
         return mName;
+    }
+
+    public String getUser() {
+        return mUser;
     }
 
     @Override
