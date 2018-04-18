@@ -223,6 +223,8 @@ public class MemPlugin extends Plugin {
             } else if ("MemFree".equals(key)) {
                 expl = "This is the amount of yet completely not used memory.";
                 mFreeMem = longValue;
+            } else if ("MemAvailable".equals(key)) {
+                expl = "This is the amount of memory available for the android system.";
             } else if ("Buffers".equals(key)) {
                 expl = "Memory in buffer cache. This memory can be freed by the kernel when needed.";
                 mBuffers = longValue;
@@ -265,6 +267,8 @@ public class MemPlugin extends Plugin {
                 expl = "Largest contiguous block of vmalloc area which is free.";
             } else if ("Shmem".equals(key)) {
                 expl = "Used shared memory (usually used by IPC)";
+            } else {
+                expl = "No description.";
             }
 
             // Add the data to the table
