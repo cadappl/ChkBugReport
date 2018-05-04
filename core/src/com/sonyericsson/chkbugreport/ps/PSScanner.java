@@ -61,7 +61,7 @@ public class PSScanner {
 
         // Process the PS section
         PSRecords ret = new PSRecords();
-        int lineIdx = 0, idxPid = -1, idxPPid = -1, idxPcy = -1, idxName = -1, idxNice = -1, size = 0;
+        int lineIdx = 0, idxUser = -1, idxPid = -1, idxPPid = -1, idxPcy = -1, idxName = -1, idxNice = -1, size = 0;
         for (int tries = 0; tries < 10 && lineIdx < ps.getLineCount(); tries++) {
             String buff = ps.getLine(lineIdx++);
             Matcher matcher = HEADER.matcher(buff);
@@ -69,7 +69,9 @@ public class PSScanner {
                 String items[] = buff.split("\\s+");
                 size = items.length;
                 for (int i = 0; i < size; i++) {
-                    if ("PID".equals(items[i])) {
+                    if ("USER".equals(items[i])) {
+                        idxUser = i;
+                    } else if ("PID".equals(items[i])) {
                         idxPid = i;
                     } else if ("PPID".equals(items[i])) {
                         idxPPid = i;
@@ -161,8 +163,14 @@ public class PSScanner {
                 if (name.startsWith("S ")) name = name.substring(2);
             }
 
+            // Extract user
+            String user = "";
+            if (idxUser >= 0) {
+                user = ensureItemWithOffset(idxUser, size, items);
+            }
+
             // Fix the name
-            ret.put(pid, new PSRecord(pid, ppid, nice, pcy, name));
+            ret.put(pid, new PSRecord(pid, ppid, nice, pcy, name, user));
 
             // Check if we should create a ProcessRecord for this
             if (pidZygote == -1 && name.equals("zygote")) {

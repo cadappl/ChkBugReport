@@ -28,6 +28,7 @@ public class ProcessLink extends DocNode {
     public static final int SHOW_ALL = 0;
     public static final int SHOW_PID = 1;
     public static final int SHOW_NAME = 2;
+    public static final int SHOW_USER = 3;
 
     private BugReportModule mMod;
     private int mPid;
@@ -66,6 +67,9 @@ public class ProcessLink extends DocNode {
         String name = mName;
         if (name == null) {
             switch (mFlags) {
+                case SHOW_USER:
+                    name = (pr == null) ? "-" : pr.getProcUser();
+                    break;
                 case SHOW_PID:
                     name = Integer.toString(mPid);
                     break;

@@ -62,6 +62,7 @@ public class PSTreePlugin extends Plugin {
         t.addStyle("treeTable pstree");
         t.addColumn("PID", Table.FLAG_NONE);
         t.addColumn("PPID", Table.FLAG_ALIGN_RIGHT);
+        t.addColumn("User", Table.FLAG_NONE);
         t.addColumn("Name", Table.FLAG_NONE);
         t.addColumn("Nice", Table.FLAG_ALIGN_RIGHT);
         t.addColumn("Policy", Table.FLAG_ALIGN_RIGHT);
@@ -80,6 +81,7 @@ public class PSTreePlugin extends Plugin {
             t.setNextRowId("pstree-" + pid);
             t.addData(new ProcessLink(br, pid, ProcessLink.SHOW_PID));
             t.addData(new ProcessLink(br, ppid, ProcessLink.SHOW_PID));
+            t.addData(ps.getUser());
             t.addData(new ProcessLink(br, pid, ProcessLink.SHOW_NAME));
             t.addData(ps.getNice());
             t.addData(ps.getPolicyStr());

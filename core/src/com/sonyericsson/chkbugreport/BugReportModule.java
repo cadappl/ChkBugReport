@@ -67,6 +67,8 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -80,6 +82,8 @@ public class BugReportModule extends Module {
     private static final String SECTION_DIVIDER = "-------------------------------------------------------------------------------";
 
     private static final String TYPE_BUGREPORT = "!BUGREPORT";
+    private static final Pattern SECTION_END = Pattern.compile(
+            "------ (\\d+.\\d+)s was the duration of '(.*?)(?: \\(.*\\))?' ------");
 
     private Vector<ProcessRecord> mProcessRecords = new Vector<ProcessRecord>();
     private HashMap<Integer, ProcessRecord> mProcessRecordMap = new HashMap<Integer, ProcessRecord>();
@@ -237,6 +241,11 @@ public class BugReportModule extends Module {
 
             // Parse sections and sub-sections
             if (buff.startsWith("------ ")) {
+                Matcher matcher = SECTION_END.matcher(buff);
+                if (matcher.matches()) {
+                    continue;
+                }
+
                 // build up file name
                 int e = buff.indexOf(" ------");
                 if (e >= 0) {
