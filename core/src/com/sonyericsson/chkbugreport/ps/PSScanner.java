@@ -43,8 +43,9 @@ public class PSScanner {
         return ret;
     }
 
+    // Process name may be empty, whose index is 7
     private String ensureItemWithOffset(int index, int size, String[] item) {
-        if (item.length == size) {
+        if (item.length == size || index < 7) {
             return item[index];
         } else {
             // Some item is missed, return the item backwards
