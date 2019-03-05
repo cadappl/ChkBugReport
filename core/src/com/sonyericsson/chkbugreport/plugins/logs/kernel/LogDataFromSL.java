@@ -35,7 +35,7 @@ import com.sonyericsson.chkbugreport.plugins.logs.SystemLogPlugin;
             int cnt = sl.size();
             for (int i = 0; i < cnt; i++) {
                 LogLine l = sl.get(i);
-                if (l.tag.equals("kernel") || l.tag.equals("Kernel")) {
+                if ("kernel".equals(l.tag.toLowerCase())) {
                     if (mKernelLog == null) {
                         mKernelLog = new Section(br, Section.KERNEL_LOG_FROM_SYSTEM);
                         br.addSection(mKernelLog);
