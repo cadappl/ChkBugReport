@@ -43,6 +43,8 @@ public class SystemLogPlugin extends LogPlugin {
 
     private static final Pattern PATTERN_CONNECTIVITY_SERVICE = Pattern.compile("ConnectivityChange for (.+): (.+)/(.+)");
 
+    private static final Pattern NATVIE_CRASH_NAME = Pattern.compile(
+            "pid: ([0-9]+), tid: ([0-9]+), name: (\\w+) +>>> ([A-Za-z0-9_\\-/]+) <<<");
     private ConnectivityLogs mConnectivityLogs;
 
     public SystemLogPlugin() {
@@ -144,7 +146,7 @@ public class SystemLogPlugin extends LogPlugin {
                     sl.msg.startsWith("act=")) {
                 analyzeANR(sl, i, br, s);
             }
-        } else if (sl.tag.equals("DEBUG") && sl.level == 'I') {
+        } else if (sl.tag.equals("DEBUG")) {
             if (sl.msg.equals("*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***")) {
                 analyzeNativeCrash(sl, i, br, s);
             }
@@ -153,29 +155,19 @@ public class SystemLogPlugin extends LogPlugin {
         } else if (sl.tag.equals("bt_hci") &&
                 sl.msg.startsWith("command_timed_out hci layer timeout waiting for response to a command")) {
             analyzeBluedroidReboot(sl, i, br, s);
-        }
-
-        if (isFatalException(sl)) {
+        } else if (isFatalException(sl)) {
             analyzeFatalException(sl, i, br, s);
-        }
-
-        if (sl.level == 'E' && sl.tag.equals("StrictMode")) {
+        } else if (sl.level == 'E' && sl.tag.equals("StrictMode")) {
             analyzeStrictMode(sl, i, br, s);
-        }
-
-        if (sl.tag.equals("dalvikvm") && sl.msg.startsWith("GC_")) {
+        } else if (sl.tag.equals("dalvikvm") && sl.msg.startsWith("GC_")) {
             analyzeGC(sl, i, br, s);
-        }
-
-        if (sl.tag.equals("WindowManager") && sl.level == 'I') {
+        } else if (sl.tag.equals("WindowManager") && sl.level == 'I') {
             String key = "Setting rotation to ";
             if (sl.msg.startsWith(key)) {
                 int rot = sl.msg.charAt(key.length()) - '0';
                 analyzeRotation(sl, br, rot);
             }
-        }
-
-        if (sl.msg.startsWith("\tat ") && sl.level == 'E') {
+        } else if (sl.msg.startsWith("\tat ") && sl.level == 'E') {
             analyzeJavaException(sl, i, br, s);
         }
 
@@ -243,16 +235,20 @@ public class SystemLogPlugin extends LogPlugin {
         new Block(bug).add(new Link(sl.getAnchor(), "(link to log)"));
         DocNode log = new Block(bug).addStyle("log");
         log.add(sl.symlink());
+        int first = i;
         int end = i + 1;
         while (end < s.getLineCount()) {
             LogLine sl2 = getParsedLine(end);
             if (!sl2.ok) break;
             if (!sl2.tag.equals("DEBUG")) break;
-            if (sl2.level != 'I') break;
+            Matcher matcher = NATVIE_CRASH_NAME.matcher(sl2.msg);
+            if (matcher.find()) {
+                 bug.setName("Native crash: " + matcher.group(3) + " (" + matcher.group(1) + ")");
+            }
             log.add(sl2.symlink());
             end++;
         }
-        bug.setAttr(Bug.ATTR_FIRST_LINE, i);
+        bug.setAttr(Bug.ATTR_FIRST_LINE, first);
         bug.setAttr(Bug.ATTR_LAST_LINE, end);
         bug.setAttr(Bug.ATTR_LOG_INFO_ID, getInfoId());
         br.addBug(bug);
@@ -339,6 +335,9 @@ public class SystemLogPlugin extends LogPlugin {
             if (!sl2.ok) break;
             if (!sl2.tag.equals("AndroidRuntime")) break;
             if (sl2.level != 'E') break;
+            if (sl2.msg.startsWith("Process:")) {
+                bug.setName("FATAL EXCEPTION: " + sl2.msg.substring(9));
+            }
             log.add(sl2.symlink());
             end++;
         }

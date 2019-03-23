@@ -382,7 +382,7 @@ public abstract class LogPlugin extends Plugin implements LogData {
     }
 
     protected void analyze(LogLine sl, int i, BugReportModule br, Section s) {
-        if (sl.level == 'F') {
+        if (sl.level == 'F' && !sl.tag.equals("DEBUG")) {
             reportFatalLog(sl, i, br, s);
         }
     }

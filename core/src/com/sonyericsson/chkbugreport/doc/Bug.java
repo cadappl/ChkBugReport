@@ -90,6 +90,10 @@ public class Bug extends DocNode {
         add(new InternalRef());
     }
 
+    public void setName(String name) {
+        mName = name;
+    }
+
     public String getName() {
         return mName;
     }
