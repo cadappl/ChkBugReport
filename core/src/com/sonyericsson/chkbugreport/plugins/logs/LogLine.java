@@ -28,6 +28,7 @@ import com.sonyericsson.chkbugreport.doc.SimpleText;
 import com.sonyericsson.chkbugreport.util.HtmlUtil;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -275,7 +276,16 @@ public class LogLine extends DocNode {
         // Read fields
         if (msg.startsWith("[") && msg.endsWith("]")) {
             String s = msg.substring(1, msg.length() - 1);
-            fields = s.split(",");
+            String[] sl = s.split(",");
+            ArrayList<String> al = new ArrayList<String>();
+            for (String ss : sl) {
+                if (ss.startsWith(" ") && al.size() > 0) {
+                    al.set(al.size() - 1,  al.get(al.size() - 1) + ss);
+                } else {
+                    al.add(ss);
+                }
+            }
+            fields = al.toArray(new String[al.size()]);
         } else {
             fields = new String[1];
             fields[0] = msg;
