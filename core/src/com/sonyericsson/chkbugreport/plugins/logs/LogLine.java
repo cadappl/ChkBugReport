@@ -40,6 +40,7 @@ import java.util.regex.Pattern;
 public class LogLine extends DocNode {
 
     private static final Pattern TS = Pattern.compile("\\[ *([0-9]+)\\.([0-9]+)(@[0-9]+)?\\].*");
+    private static final Pattern CHATTY_PREFIX = Pattern.compile("uid=\\d+(\\([^)]+\\))? ([^ ]+) ");
     private static final Pattern LOGCAT_PREFIX = Pattern.compile(
             "([0-9]{2}-[0-9]{2}) +([0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}) +([0-9]+) +([0-9]+) +(\\w) +([^:]+):");
     private static final Pattern LOGCAT_PREFIX2 = Pattern.compile(
@@ -242,6 +243,14 @@ public class LogLine extends DocNode {
         tag = matcher.group(idxTag).trim();
         level = matcher.group(idxLevel).charAt(0);
         msg = line.substring(matcher.group().length()).trim();
+
+        // find the tag in chatty lines
+        if ("chatty".equals(tag)) {
+            Matcher chatty = CHATTY_PREFIX.matcher(msg);
+            if (chatty.find()) {
+                tag = chatty.group(2);
+            }
+        }
 
         parseTS(line);
         if (pid > 0) {
