@@ -627,18 +627,21 @@ public class BugReportModule extends Module {
         return null;
     }
 
-    private ZipEntry tryBugreportzFromZip(ZipFile zip) {
+    private ZipEntry tryBugreportzFromZip(ZipFile zip) throws IOException {
         ZipEntry entry = findFileInZip(zip, "main_entry.txt");
         if (entry != null) {
+            InputStream is = null;
             byte name[] = new byte[256];
             try {
-                InputStream is = zip.getInputStream(entry);
+                is = zip.getInputStream(entry);
                 int length = is.read(name);
                 if (length > 0) {
                     return findFileInZip(zip, new String(Arrays.copyOf(name, length), "UTF-8"));
                 }
-            } catch (IOException e) {
-                // Do nothing
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
             }
         }
 
